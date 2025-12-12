@@ -20,6 +20,11 @@ jobs:
       # Step 1: Check out the repository's code
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set lowercase repository name
+        id: repo
+        run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "repository=$REPO_LOWER" >> $GITHUB_OUTPUT
       
       # Step 2: Log in to the GitHub Container Registry (GHCR)
       - name: Login to GitHub Container Registry
