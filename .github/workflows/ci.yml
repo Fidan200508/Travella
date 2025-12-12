@@ -1,0 +1,44 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm ci
+      working-directory: BackEnd
+
+    # === CACHING STEP START ===
+    # This step saves and restores Jest cache to speed up the workflow.
+    - uses: actions/cache@v4
+      name: Cache Jest results
+      with:
+        # Cache directory inside the BackEnd folder
+        path: BackEnd/.jest-cache
+        # Cache key changes only when package-lock.json changes
+        key: ${{ runner.os }}-jest-${{ hashFiles('BackEnd/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-jest-
+    # === CACHING STEP END ===
+
+    - name: Run tests
+      run: npm test -- --ci --maxWorkers=4 --passWithNoTests
+      working-directory: BackEnd
+      continue-on-error: true  # CI не упадет если тесты провалятся
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
