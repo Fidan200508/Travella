@@ -25,7 +25,8 @@ jobs:
         run: |
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "repository=$REPO_LOWER" >> $GITHUB_OUTPUT
-      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       # Step 2: Log in to the GitHub Container Registry (GHCR)
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
